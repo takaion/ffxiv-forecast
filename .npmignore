@@ -1,0 +1,10 @@
+/.github
+/.vscode
+/src
+/tsconfig.json
+/*.tgz
+jest.config.js
+*test.*
+
+*secret.*
+secret*

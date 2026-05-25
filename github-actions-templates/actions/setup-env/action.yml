@@ -1,0 +1,22 @@
+name: 'Setup Node.js Environment'
+description: 'Checks out the repository and sets up Node.js'
+inputs:
+  github-token:
+    description: 'The GITHUB_TOKEN to install private packages'
+    required: false
+runs:
+  using: 'composite'
+  steps:
+    - uses: pnpm/action-setup@v4
+      with:
+        version: 10
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 22
+        cache: pnpm
+        registry-url: https://npm.pkg.github.com/
+    - name: Install dependencies
+      shell: bash
+      run: pnpm i --frozen-lockfile
+      env:
+        NODE_AUTH_TOKEN: ${{inputs.github-token}}
