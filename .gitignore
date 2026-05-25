@@ -132,3 +132,4 @@ dist
 # Project
 *secret.*
 secret*
+.pnpm-store/
