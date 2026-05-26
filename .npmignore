@@ -1,5 +1,6 @@
 /.github
 /.vscode
+/.pnpm-store
 /src
 /tsconfig.json
 /*.tgz
