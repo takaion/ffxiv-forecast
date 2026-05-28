@@ -1,4 +1,4 @@
-import EorzeaTime from "../components/calendar/EorzeaTime.js";
+import EorzeaTime from "../components/EorzeaTime.js";
 import w, { Weather } from "./Weather.js";
 
 interface WeatherThreshold {
