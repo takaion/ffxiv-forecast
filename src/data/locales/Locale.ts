@@ -1,13 +1,14 @@
 import { Weather } from "../Weather.js";
 import { Zone } from "../ZoneWeather.js";
 import ja from "./ja.js";
+import en from "./en.js";
 
-type Locale = "ja";
+type Locale = "ja" | "en";
 
 function getLocaleData(locale: Locale = "ja") {
     switch (locale) {
         case "ja": return ja
-        default: return ja
+        case "en": return en
     }
 }
 
