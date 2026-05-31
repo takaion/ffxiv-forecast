@@ -121,9 +121,9 @@ export default class ZoneCondition {
         et ??= EorzeaTime.now()
         const target = 60 * et.hours + et.minutes
         if (condEt.start > condEt.end) {
-            return condEt.start <= target || target <= condEt.end
+            return condEt.start <= target || target < condEt.end
         }
-        return condEt.start <= target && target <= condEt.end
+        return condEt.start <= target && target < condEt.end
     }
 
     /**
