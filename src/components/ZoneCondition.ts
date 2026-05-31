@@ -177,13 +177,18 @@ export default class ZoneCondition {
         return this.cachedTimeToCheckCandidate = candidates.toSorted((a, b) => a - b)
     }
 
+    protected getNextEorzeaTimeFromCandidateMinutes(et: EorzeaTime, minutes: number[]) {
+        const t = et.hours * 60 + et.minutes
+        const candidates = Array.from(new Set(minutes)).toSorted((a, b) => a - b)
+        const next = candidates.find(c => t < c) ?? candidates[0]
+        return et.getSpecifiedTime(Math.floor(next / 60), next % 60)
+    }
+
     /** 指定されたエオルゼア時間から次のチェック対象となる時間を探して返す。 */
     protected getNextEorzeaTimeToCheck(et: EorzeaTime) {
         if (!this.et) return et.getWeatherTime(1);
-        const t = et.hours * 60 + et.minutes
         const candidates = this.getTimeToCheckCandidates()
-        const next = candidates.find(c => t < c) ?? candidates[0]
-        return et.getSpecifiedTime(Math.floor(next / 60), next % 60)
+        return this.getNextEorzeaTimeFromCandidateMinutes(et, candidates)
     }
 
     /**
@@ -198,10 +203,21 @@ export default class ZoneCondition {
         let et = base ?? EorzeaTime.now()
         if (this.isAlways()) return et;
         if (!this.isValidWeatherConditionForZone()) throw new Error(`Cannot find the next match (weather set is invalid)`);
-        const next = () => this.getNextEorzeaTimeToCheck(et);
+        et = this.findWindowEnd(et); // 今マッチしている場合は終了する時間へ飛ぶ
         do {
-            et = next()
+            et = this.getNextEorzeaTimeToCheck(et);
         } while (!this.isMatch(et)); // isWeatherMatchだけでも十分に判定できるが念のため
+        return et;
+    }
+
+    findWindowEnd(base?: EorzeaTime): EorzeaTime {
+        let et = base ?? EorzeaTime.now();
+        if (this.isAlways()) return et;
+        const weatherChange = [0, 480, 960];
+        const candidates = [...weatherChange, ...(this.et ? [this.et.end] : [])]
+        while (this.isMatch(et)) {
+            et = this.getNextEorzeaTimeFromCandidateMinutes(et, candidates)
+        }
         return et;
     }
 
