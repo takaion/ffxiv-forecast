@@ -49,6 +49,11 @@ export default class EorzeaTime {
         return step2 % 100
     }
 
+    /** 保持しているUNIX時間から{@link Date}インスタンスを作成して返す */
+    getEarthDate() {
+        return new Date(this.unixSeconds * 1000)
+    }
+
     /**
      * 天気が始まる時間(0:00:00、8:00:00または16:00:00)の新しいインスタンスを作成して返す。
      * @param step 前後させる天気のステップ数。例えば0を指定すると現在の天気、1を指定すると次の天気、-1を指定すると前の天気が始まる時間のインスタンスが作成される。
