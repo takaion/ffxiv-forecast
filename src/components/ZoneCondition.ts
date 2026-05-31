@@ -70,6 +70,8 @@ export default class ZoneCondition {
         previous: Set<Weather>
     }
 
+    protected cachedTimeToCheckCandidate?: number[]
+
     constructor(options: ZoneConditionOptions) {
         this.zone = options.zone
         if (options.et) {
@@ -163,6 +165,27 @@ export default class ZoneCondition {
         return this.isMatchTime(et) && this.isMatchWeather(et)
     }
 
+    /** 保持している時間条件からチェックする必要のあるETのリストを作成して返す。 */
+    protected getTimeToCheckCandidates(): number[] {
+        if (this.cachedTimeToCheckCandidate) return this.cachedTimeToCheckCandidate;
+        const et = this.et;
+        if (!this.hasWeatherCondition()) return et ? [et.start]: [0]; // 時間条件のみの場合は開始時間のみ、常に条件を満たす場合は0(0:00)のみを返す
+        const allWeatherChange = [0, 480, 960]
+        if (!et) return allWeatherChange; // 0:00, 8:00, 16:00
+        const candidates = [et.start]
+        allWeatherChange.filter(m => et.start < et.end ? et.start < m && m < et.end : et.start < m || m < et.end).map(m => candidates.push(m))
+        return this.cachedTimeToCheckCandidate = candidates.toSorted((a, b) => a - b)
+    }
+
+    /** 指定されたエオルゼア時間から次のチェック対象となる時間を探して返す。 */
+    protected getNextEorzeaTimeToCheck(et: EorzeaTime) {
+        if (!this.et) return et.getWeatherTime(1);
+        const t = et.hours * 60 + et.minutes
+        const candidates = this.getTimeToCheckCandidates()
+        const next = candidates.find(c => t < c) ?? candidates[0]
+        return et.getSpecifiedTime(Math.floor(next / 60), next % 60)
+    }
+
     /**
      * インスタンスの持つ条件に合致するエオルゼア時間を検索する。
      * 与えられたエオルゼア時間(指定しない場合は、現在日時から作成されたエオルゼア時間のインスタンス)がすでに条件を満たす場合はその次のマッチする日時を検索する。
@@ -175,9 +198,7 @@ export default class ZoneCondition {
         let et = base ?? EorzeaTime.now()
         if (this.isAlways()) return et;
         if (!this.isValidWeatherConditionForZone()) throw new Error(`Cannot find the next match (weather set is invalid)`);
-        const start = {hours: Math.floor((this.et?.start ?? 0) / 60), minutes: (this.et?.start ?? 0) % 60};
-        const next = this.et ? () => et.getSpecifiedTime(start.hours, start.minutes) : () => et.getWeatherTime(1);
-        if (!this.hasWeatherCondition()) return next();
+        const next = () => this.getNextEorzeaTimeToCheck(et);
         do {
             et = next()
         } while (!this.isMatch(et)); // isWeatherMatchだけでも十分に判定できるが念のため
