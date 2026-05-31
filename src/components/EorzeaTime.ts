@@ -7,7 +7,7 @@ export default class EorzeaTime {
     constructor(public unixSeconds: number) {}
 
     get bell() {
-        return Math.floor(this.unixSeconds / 175);
+        return Math.floor(this.unixSeconds / EorzeaTime.HOUR);
     }
 
     get hours() {
@@ -15,7 +15,7 @@ export default class EorzeaTime {
     }
 
     protected get moment() {
-        return (this.unixSeconds % 175) / 175 * 60
+        return (this.unixSeconds % EorzeaTime.HOUR) / EorzeaTime.HOUR * 60
     }
 
     get minutes() {
