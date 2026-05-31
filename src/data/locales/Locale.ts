@@ -1,5 +1,5 @@
 import { Weather } from "../Weather.js";
-import { Zone } from "../ZoneWeather.js";
+import { ZoneId } from "../ZoneWeather.js";
 import ja from "./ja.js";
 import en from "./en.js";
 
@@ -16,7 +16,7 @@ export function getWeatherName(weather: Weather, locale?: Locale) {
     return getLocaleData(locale).weather[weather]
 }
 
-export function getZoneName(zone: Zone, locale?: Locale) {
+export function getZoneName(zone: ZoneId, locale?: Locale) {
     return getLocaleData(locale).zone[zone]
 }
 

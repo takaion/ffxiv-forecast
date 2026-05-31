@@ -107,10 +107,10 @@ const thresholds = {
     SOUTH_HORN: [{w: w.CLEAR_SKIES, t: 10}, {w: w.FAIR_SKIES, t: 55}, {w: w.CLOUDS, t: 70}, {w: w.RAIN, t: 80}, {w: w.ATMOSPHERIC_PHANTASMS, t: 95}, {w: w.ILLUSORY_DISTURBANCES, t: 100}],
 } as const;
 
-export type Zone = keyof typeof thresholds;
+export type ZoneId = keyof typeof thresholds;
 
-export function getAllZones(): Zone[] {
-  return Object.keys(thresholds) as Zone[];
+export function getAllZones(): ZoneId[] {
+  return Object.keys(thresholds) as ZoneId[];
 }
 
 function getWeatherByTarget(entries: readonly WeatherThreshold[], target: number) {
@@ -118,7 +118,7 @@ function getWeatherByTarget(entries: readonly WeatherThreshold[], target: number
   return entry?.w ?? null
 }
 
-export function getZoneWeather(zone: Zone, et?: EorzeaTime) {
+export function getZoneWeather(zone: ZoneId, et?: EorzeaTime) {
   et ??= EorzeaTime.now();
   const entries = thresholds[zone]
   const weather = getWeatherByTarget(entries, et.weatherTarget);
