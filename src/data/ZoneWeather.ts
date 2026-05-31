@@ -125,3 +125,9 @@ export function getZoneWeather(zone: ZoneId, et?: EorzeaTime) {
   if (!weather) throw new Error(`Could not find weather for zone "${zone}" at target: ${et.weatherTarget}`);
   return weather
 }
+
+export function getAvailableWeathers(zone: ZoneId): Set<Weather> {
+  const entries = thresholds[zone];
+  const weathers = new Set(entries.map(e => e.w))
+  return weathers
+}
