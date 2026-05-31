@@ -59,6 +59,33 @@ export default class EorzeaTime {
         const eh = 8 * EorzeaTime.HOUR // Eight Hours
         return new EorzeaTime(us + step * eh - (us % eh))
     }
+
+    /**
+     * 特定の時間・分を持つエオルゼア時間のインスタンスを作成する。
+     * 作成されるインスタンスは必ず現在のインスタンスが持つ日時より後となる。
+     * 
+     * 例えば、ET 12:00のインスタンスで12:00を指定するとエオルゼア上で同じ日のET 12:00のインスタンスが作成される。
+     * 一方、11:30を指定するとエオルゼア上で次の日のET 11:30のインスタンスが作成される。
+     * @param hours 
+     * @param minutes 
+     * @returns 
+     */
+    getSpecifiedTime(hours: number, minutes: number) {
+        const us = this.unixSeconds
+        const secondsToAdd = Math.ceil(hours * EorzeaTime.HOUR + minutes * EorzeaTime.MINUTE)
+        const usDayStart = us - (us % EorzeaTime.DAY)
+        const target = usDayStart + secondsToAdd
+        return new EorzeaTime(target + (target <= us ? EorzeaTime.DAY : 0))
+    }
+
+    /**
+     * 指定された日数分だけエオルゼア上での日付を進めた、または戻した新しいエオルゼア時間のインスタンスを作成する。
+     * @param n 指定された日数分だけエオルゼア上での日付を進める(>0)または戻す(<0)。
+     * @returns 
+     */
+    skipDays(n: number) {
+        return new EorzeaTime(this.unixSeconds + n * EorzeaTime.DAY)
+    }
     
     /** `Date`のインスタンスまたはミリ秒単位のUNIX時間からインスタンスを作成する */
     static from(date: Date | number) {
