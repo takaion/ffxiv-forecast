@@ -25,5 +25,12 @@
 		"LANG": "C.UTF-8"
 	},
 	"postCreateCommand": "npm install -g pnpm",
-	"postStartCommand": "pnpm install"
+	"postStartCommand": "pnpm install",
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"vitest.explorer"
+			]
+		}
+	}
 }
