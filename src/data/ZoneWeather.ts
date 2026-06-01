@@ -46,7 +46,7 @@ const thresholds = {
     IDYLLSHIRE: [{w: w.CLOUDS, t: 10}, {w: w.FOG, t: 20}, {w: w.RAIN, t: 30}, {w: w.SHOWERS, t: 40}, {w: w.CLEAR_SKIES, t: 70}, {w: w.FAIR_SKIES, t: 100}],
     DRAVANIAN_FORELANDS: [{w: w.CLOUDS, t: 10}, {w: w.FOG, t: 20}, {w: w.THUNDER, t: 30}, {w: w.DUST_STORMS, t: 40}, {w: w.CLEAR_SKIES, t: 70}, {w: w.FAIR_SKIES, t: 100}],
     DRAVANIAN_HINTERLANDS: [{w: w.CLOUDS, t: 10}, {w: w.FOG, t: 20}, {w: w.RAIN, t: 30}, {w: w.SHOWERS, t: 40}, {w: w.CLEAR_SKIES, t: 70}, {w: w.FAIR_SKIES, t: 100}],
-    CHURNING_MISTS: [{w: w.CLOUDS, t: 100}, {w: w.GALES, t: 20}, {w: w.UMBRAL_STATIC, t: 40}, {w: w.CLEAR_SKIES, t: 70}, {w: w.FAIR_SKIES, t: 100}],    
+    CHURNING_MISTS: [{w: w.CLOUDS, t: 10}, {w: w.GALES, t: 20}, {w: w.UMBRAL_STATIC, t: 40}, {w: w.CLEAR_SKIES, t: 70}, {w: w.FAIR_SKIES, t: 100}],    
     // モードゥナ
     MOR_DHONA: [{w: w.CLOUDS, t: 15}, {w: w.FOG, t: 30}, {w: w.GLOOM, t: 60}, {w: w.CLEAR_SKIES, t: 75}, {w: w.FAIR_SKIES, t: 100}],
     // ギラバニア
