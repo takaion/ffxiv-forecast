@@ -4,7 +4,9 @@ export default class EorzeaTime {
     static readonly MINUTE = this.HOUR / 60
     static readonly SECOND = this.MINUTE / 60
 
-    constructor(public unixSeconds: number) {}
+    constructor(public unixSeconds: number) {
+        if (Number.isNaN(unixSeconds)) throw new Error(`NaN is not acceptable`)
+    }
 
     get bell() {
         return Math.floor(this.unixSeconds / EorzeaTime.HOUR);
