@@ -135,6 +135,28 @@ const localesData: LocalesData = {
         LEPOCERAS_ELEGANS: "レポセラス・エレガンス",
         FURCACAUDA: "フルカカウダ",
         SIDEREAL_WHALE: "スターホエール",
+    },
+    oceanFishing: {
+        time: {
+            day: "昼",
+            evening: "夕",
+            night: "夜"
+        },
+        zone: {
+            rhotanoSea: "ロータノ海",
+            bloodbrineSea: "緋汐海",
+            rothlytSound: "ロズリト湾",
+            northernStraitOfMelthor: "メルトール海峡北",
+            southernStraitOfMelthor: "メルトール海峡南",
+            galadionBay: "ガラディオン湾",
+            theCieldalaes: "シェルダレー諸島",
+            theRubySea: "紅玉海",
+            thavnair: "サベネア島",
+            theOneRiver: "無二江",
+            theSirensongSea: "セイレーン海",
+            kugane: "クガネ",
+            unnamedIsland: "名もなき島"
+        }
     }
 }
 

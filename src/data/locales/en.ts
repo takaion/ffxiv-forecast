@@ -136,6 +136,28 @@ const localesData: LocalesData = {
         FURCACAUDA: "Furcacauda",
         SIDEREAL_WHALE: "Sidereal Whale",
     },
+    oceanFishing: {
+        time: {
+            day: "Day",
+            evening: "Evening",
+            night: "Night"
+        },
+        zone: {
+            rhotanoSea: "Rhotano Sea",
+            bloodbrineSea: "Bloodbrine Sea",
+            rothlytSound: "Rothlyt Sound",
+            northernStraitOfMelthor: "Northern Strait of Melthor",
+            southernStraitOfMelthor: "Southern Strait of Melthor",
+            galadionBay: "Galadion Bay",
+            theCieldalaes: "The Cieldalaes",
+            theRubySea: "The Ruby Sea",
+            thavnair: "Thavnair",
+            theOneRiver: "The One River",
+            theSirensongSea: "The Sirensing Sea",
+            kugane: "Kugane",
+            unnamedIsland: "Unnamed Island"
+        },
+    },
 }
 
 export default localesData;
