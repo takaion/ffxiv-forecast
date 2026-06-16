@@ -22,26 +22,34 @@ export default class OceanFishingRoute {
         if (Number.isNaN(unixSeconds)) throw new Error(`NaN is not acceptable for ocean fishing route`);
     }
 
+    /** インスタンスが持つUNIX時間に応じた{@link Date}のインスタンス */
     get date() {
         return new Date(this.unixSeconds * 1000);
     }
 
+    /** 基準となる日時(2020/01/05 1:00 JST)から数えた航海数 */
     get cycle() {
         // JST 1時に航路の切り替えが行われる
         const offset: number = OceanFishingRoute.TIME_CYCLE_OFFSET;
         return Math.floor(this.unixSeconds / OceanFishingRoute.CYCLE_SECONDS - offset);
     }
 
+    /** 乗船を受け付けているかを返す。 */
     isAccepting() {
         return (this.unixSeconds % OceanFishingRoute.CYCLE_SECONDS) < OceanFishingRoute.ACCEPT_WINDOW_SECONDS;
     }
 
+    /** インスタンスが持つ時間またはそれ以前に航海が始まるUNIX時間を返す。 */
     getCurrentCycleStartUnixSeconds() {
         const us = this.unixSeconds;
         const cs = OceanFishingRoute.CYCLE_SECONDS;
         return us - (us % cs);
     }
 
+    /**
+     * インスタンスが持つ時間またはそれ以前に航海が始まる時間のインスタンスを作成して返す。
+     * @param [step=0] 指定された整数だけ始まる航海をずらして返す。(例: -1を設定してひとつ前の航海時の情報を得る。1を設定して次の航海の情報を得る。)
+     */
     getCycleStart(step: number = 0) {
         return new OceanFishingRoute(this.getCurrentCycleStartUnixSeconds() + step * OceanFishingRoute.CYCLE_SECONDS);
     }
@@ -69,10 +77,12 @@ export default class OceanFishingRoute {
         return startTimeIndex + 2;
     }
 
+    /** 直近の航海における開始時間帯(昼、夕、または夜)を返す。 */
     getStartTime(cycle?: number): OceanFishingTime {
         return this.getTimeByIndex(this.getStartTimeIndex(cycle));
     }
 
+    /** 直近の航海における時間帯(昼、夕、または夜)すべての配列を返す。 */
     getTimes(cycle?: number): OceanFishingTime[] {
         const startIndex = this.getStartTimeIndex(cycle)
         return [
@@ -89,6 +99,7 @@ export default class OceanFishingRoute {
         return zones[index]
     }
 
+    /** 近海航路の行き先を返す。 */
     getIndigoDestination(cycle?: number): OceanFishingZone {
         const z = oceanFishingZone;
         const dests = [
@@ -100,6 +111,7 @@ export default class OceanFishingRoute {
         return this.getDestinationIndex(dests, cycle);
     }
 
+    /** 遠洋航路の行き先を返す。 */
     getRubyDestination(cycle?: number) {
         const z = oceanFishingZone;
         const dests = [
@@ -111,6 +123,7 @@ export default class OceanFishingRoute {
         return this.getDestinationIndex(dests, cycle)
     }
 
+    /** 航路の行き先に応じて設定されているルートをエリアの配列で返す。 */
     getAllZonesForDestination(dest: OceanFishingZone): OceanFishingZone[] | null {
         const z = oceanFishingZone;
         switch (dest) {
@@ -134,6 +147,7 @@ export default class OceanFishingRoute {
         return null;
     }
 
+    /** 近海航路または遠洋航路のルートを返す */
     protected getRoute(isIndigo: boolean) {
         const dest = isIndigo ? this.getIndigoDestination() : this.getRubyDestination();
         const route = this.getAllZonesForDestination(dest);
@@ -145,10 +159,12 @@ export default class OceanFishingRoute {
         });
     }
 
+    /** 近海航路のルートを返す。 */
     getIndigoRoute() {
         return this.getRoute(true);
     }
 
+    /** 遠洋航路のルートを返す。 */
     getRubyRoute() {
         return this.getRoute(false);
     }
