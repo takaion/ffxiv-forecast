@@ -1,7 +1,7 @@
 {
-  "name": "ffxiv-forecast",
+  "name": "@takaion/ffxiv-forecast",
   "description": "",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "author": "takaion",
   "license": "Apache-2.0",
   "type": "module",
@@ -20,21 +20,21 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "test": "npm run test:vitest",
+    "test": "pnpm test:vitest",
     "test:disabled": "echo Tests are disabled",
     "test:vitest": "vitest",
     "build": "tsc",
     "build:watch": "tsc --watch",
-    "prepare": "npm run build"
+    "prepare": "pnpm build"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/takaion/ts-boilerplate.git"
+    "url": "git+https://github.com/takaion/ffxiv-forecast.git"
   },
   "bugs": {
-    "url": "https://github.com/takaion/ts-boilerplate/issues"
+    "url": "https://github.com/takaion/ffxiv-forecast/issues"
   },
-  "homepage": "https://github.com/takaion/ts-boilerplate#readme",
+  "homepage": "https://github.com/takaion/ffxiv-forecast#readme",
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@types/node": "^24.13.2",
