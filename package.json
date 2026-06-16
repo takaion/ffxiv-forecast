@@ -1,13 +1,14 @@
 {
-  "name": "ts-boilerplate",
+  "name": "@takaion/ffxiv-forecast",
   "description": "",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "author": "takaion",
   "license": "Apache-2.0",
   "type": "module",
   "engines": {
-    "node": ">=22"
+    "node": ">=24"
   },
+  "packageManager": "pnpm@11.7.0",
   "exports": {
     ".": {
       "import": {
@@ -19,30 +20,30 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "test": "npm run test:vitest",
+    "test": "pnpm test:vitest",
     "test:disabled": "echo Tests are disabled",
     "test:vitest": "vitest",
     "build": "tsc",
     "build:watch": "tsc --watch",
-    "prepare": "npm run build"
+    "prepare": "pnpm build"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/takaion/ts-boilerplate.git"
+    "url": "git+https://github.com/takaion/ffxiv-forecast.git"
   },
   "bugs": {
-    "url": "https://github.com/takaion/ts-boilerplate/issues"
+    "url": "https://github.com/takaion/ffxiv-forecast/issues"
   },
-  "homepage": "https://github.com/takaion/ts-boilerplate#readme",
+  "homepage": "https://github.com/takaion/ffxiv-forecast#readme",
   "devDependencies": {
-    "@eslint/js": "^9.32.0",
-    "@types/node": "^22.17.0",
-    "eslint": "^9.32.0",
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^24.13.2",
+    "eslint": "^10.5.0",
     "eslint-config-vitest-globals": "^2.0.2",
-    "globals": "^16.3.0",
+    "globals": "^17.6.0",
     "jiti": "^2.5.1",
-    "typescript": "^5.8.3",
-    "typescript-eslint": "^8.39.0",
-    "vitest": "^3.2.4"
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.61.0",
+    "vitest": "^4.1.8"
   }
 }
