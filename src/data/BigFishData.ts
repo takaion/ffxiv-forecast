@@ -21,7 +21,7 @@ export type BigFishId
     | "LISTRACANTHUS" | "AQUAMATON" | "CINDER_SURPRISE" | "EALAD_SKAAN" | "GREAT_SERPENT_OF_RONKA" | "LANCETFISH"
     | "HYPHALOSAURUS" | "GHARLICHTHYS" | "SNOWY_PAREXUS" | "LEPOCERAS_ELEGANS" | "FURCACAUDA" | "SIDEREAL_WHALE";
     
-const entries: Record<BigFishId, MinimizedBigFishCondition> = {
+export const bigFishEntries: Record<BigFishId, MinimizedBigFishCondition> = {
     // 2.x
     NEPTO_DRAGON: {c: {z: "EASTERN_LA_NOSCEA", w: ["rain", "showers"]}},
     ENDOCERAS: {c: {z: "WESTERN_LA_NOSCEA", t: {s: 20, e: 6}, p: ["fairSkies", "clearSkies"], w: ["clouds", "fog", "wind"]}},
@@ -72,4 +72,4 @@ export function getRealCondition(cond: MinimizedBigFishCondition) {
     return cond.c
 }
 
-export default entries;
+export default bigFishEntries;

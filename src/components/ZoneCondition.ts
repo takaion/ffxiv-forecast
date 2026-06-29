@@ -47,7 +47,7 @@ export function extractMinimizedZoneConditionOptions(o: MinimizedZoneConditionOp
  * 指定されたゾーン/エリアにおける条件を管理する。
  * エオルゼア時間({@link EorzeaTime})を与えることによって条件が満たされているか判定したり、次の条件が満たされる時間を検索する機能を持つ。
  */
-export default class ZoneCondition {
+export class ZoneCondition {
     /** 対象となるゾーン/エリア */
     readonly zone: ZoneId
     /** 
@@ -226,3 +226,5 @@ export default class ZoneCondition {
         return new this(extractMinimizedZoneConditionOptions(minimizedOptions))
     }
 }
+
+export default ZoneCondition;
