@@ -6,7 +6,7 @@ import { OceanFishingZone } from "../data/OceanFishingZone.js";
 import ja from "../data/locales/ja.js";
 import en from "../data/locales/en.js";
 
-type Locale = "ja" | "en";
+export type Locale = "ja" | "en";
 
 function getLocaleData(locale: Locale = "ja") {
     switch (locale) {

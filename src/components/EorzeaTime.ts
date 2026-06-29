@@ -1,4 +1,4 @@
-export default class EorzeaTime {
+export class EorzeaTime {
     static readonly DAY = 4200
     static readonly HOUR = this.DAY / 24
     static readonly MINUTE = this.HOUR / 60
@@ -105,3 +105,5 @@ export default class EorzeaTime {
         return this.from(Date.now());
     }
 }
+
+export default EorzeaTime;

@@ -10,7 +10,7 @@ export interface RouteZone {
  * オーシャンフィッシング航路を算出するためのクラス。
  * なおPatch 7.51時点での情報に基づくため過去パッチの日時におけるスケジュールは不正確である可能性がある。
  */
-export default class OceanFishingRoute {
+export class OceanFishingRoute {
     /** 乗船受付が始まる周期 */
     static readonly CYCLE_SECONDS = 7200;
     /** 乗船受付を行う期間 */
@@ -180,3 +180,5 @@ export default class OceanFishingRoute {
         return this.from(Date.now());
     }
 }
+
+export default OceanFishingRoute;

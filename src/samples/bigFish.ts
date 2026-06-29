@@ -2,10 +2,10 @@
 
 import { getBigFishName } from "../components/Locale.js";
 import ZoneCondition from "../components/ZoneCondition.js";
-import entries, { BigFishId, getRealCondition } from "../data/BigFishData.js";
+import bigFishEntries, { BigFishId, getRealCondition } from "../data/BigFishData.js";
 
 function main() {
-    Object.entries(entries).map(([bigFishId, minimizedCondition]) => {
+    Object.entries(bigFishEntries).map(([bigFishId, minimizedCondition]) => {
         const name = getBigFishName(bigFishId as BigFishId);
         const condition = ZoneCondition.fromMinimized(getRealCondition(minimizedCondition));
         const nextChance = condition.findNextMatch();
