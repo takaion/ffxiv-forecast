@@ -1,7 +1,7 @@
 {
   "name": "@takaion/ffxiv-forecast",
   "description": "",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "author": "takaion",
   "license": "Apache-2.0",
   "type": "module",
@@ -40,10 +40,10 @@
     "@types/node": "^24.13.2",
     "eslint": "^10.5.0",
     "eslint-config-vitest-globals": "^2.0.2",
-    "globals": "^17.6.0",
+    "globals": "^17.7.0",
     "jiti": "^2.5.1",
     "typescript": "^6.0.3",
-    "typescript-eslint": "^8.61.0",
-    "vitest": "^4.1.8"
+    "typescript-eslint": "^8.62.0",
+    "vitest": "^4.1.9"
   }
 }
