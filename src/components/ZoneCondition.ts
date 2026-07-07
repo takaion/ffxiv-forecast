@@ -40,7 +40,7 @@ export interface MinimizedZoneConditionOptions {
 
 /** 最小化された条件から{@link ZoneConditionOptions}のオブジェクトを作成する */
 export function extractMinimizedZoneConditionOptions(o: MinimizedZoneConditionOptions): ZoneConditionOptions {
-    return {zone: o.z, et: o.t ? {start: o.t.s, end: o.t.e} : undefined, weather: o.w, previousWeather: o.p}
+    return { zone: o.z, et: o.t ? { start: o.t.s, end: o.t.e } : undefined, weather: o.w, previousWeather: o.p }
 }
 
 /** 
@@ -75,7 +75,7 @@ export class ZoneCondition {
     constructor(options: ZoneConditionOptions) {
         this.zone = options.zone
         if (options.et) {
-            this.et = {start: this.parseTime(options.et.start), end: this.parseTime(options.et.end)}
+            this.et = { start: this.parseTime(options.et.start), end: this.parseTime(options.et.end) }
         }
         const toArray = (w: Weather[] | Weather | undefined): Set<Weather> => new Set(!w ? [] : Array.isArray(w) ? w : [w])
         this.weather = {
@@ -169,7 +169,7 @@ export class ZoneCondition {
     protected getTimeToCheckCandidates(): number[] {
         if (this.cachedTimeToCheckCandidate) return this.cachedTimeToCheckCandidate;
         const et = this.et;
-        if (!this.hasWeatherCondition()) return et ? [et.start]: [0]; // 時間条件のみの場合は開始時間のみ、常に条件を満たす場合は0(0:00)のみを返す
+        if (!this.hasWeatherCondition()) return et ? [et.start] : [0]; // 時間条件のみの場合は開始時間のみ、常に条件を満たす場合は0(0:00)のみを返す
         const allWeatherChange = [0, 480, 960]
         if (!et) return allWeatherChange; // 0:00, 8:00, 16:00
         const candidates = [et.start]
@@ -210,6 +210,10 @@ export class ZoneCondition {
         return et;
     }
 
+    /**
+     * 与えられた `base` (指定しない場合は現在時間) から条件(気候、ET)が終了する時間を算出する。
+     * 与えられたエオルゼア時間が条件を満たす時間ではない場合、そのまま返す。
+     */
     findWindowEnd(base?: EorzeaTime): EorzeaTime {
         let et = base ?? EorzeaTime.now();
         if (this.isAlways()) return et;
