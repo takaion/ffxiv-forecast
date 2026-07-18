@@ -8,7 +8,7 @@ function main() {
     Object.entries(bigFishEntries).map(([bigFishId, minimizedCondition]) => {
         const name = getBigFishName(bigFishId as BigFishId);
         const condition = ZoneCondition.fromMinimized(getRealCondition(minimizedCondition));
-        const nextChance = condition.findNextMatch();
+        const nextChance = condition.findNextWindowStart();
         console.log(`${name}: ${nextChance.getEarthDate().toLocaleString("ja-JP")}`);
     })
 }

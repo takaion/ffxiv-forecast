@@ -234,7 +234,8 @@ export class ZoneCondition {
         return this.isMatch(prev) && !this.isMatch(curr);
     }
 
-    private findPreviousWindowBorder(isFindStart: boolean, et: EorzeaTime, allowSameTime: boolean = true) {
+    private findPreviousWindowBorder(isFindStart: boolean, et?: EorzeaTime, allowSameTime: boolean = true) {
+        et ??= EorzeaTime.now();
         if (this.isAlways()) return et;
         const candidates = this.windowCandidates;
         let current = new EorzeaTime(et.unixSeconds - (allowSameTime ? 0 : 1));
@@ -248,7 +249,8 @@ export class ZoneCondition {
         return current
     }
 
-    private findNextWindowBorder(isFindStart: boolean, et: EorzeaTime): EorzeaTime {
+    private findNextWindowBorder(isFindStart: boolean, et?: EorzeaTime): EorzeaTime {
+        et ??= EorzeaTime.now();
         if (this.isAlways()) return et;
         const candidates = this.windowCandidates;
         let current = et;
@@ -267,7 +269,7 @@ export class ZoneCondition {
      * @param et 
      * @param allowSameTime etに与えた時間と同じ時間を許容するか
      */
-    findPreviousWindowStart(et: EorzeaTime, allowSameTime?: boolean): EorzeaTime {
+    findPreviousWindowStart(et?: EorzeaTime, allowSameTime?: boolean): EorzeaTime {
         return this.findPreviousWindowBorder(true, et, allowSameTime);
     }
 
@@ -276,7 +278,7 @@ export class ZoneCondition {
      * @param et 
      * @param allowSameTime etに与えた時間と同じ時間を許容するか
      */
-    findPreviousWindowEnd(et: EorzeaTime, allowSameTime?: boolean): EorzeaTime {
+    findPreviousWindowEnd(et?: EorzeaTime, allowSameTime?: boolean): EorzeaTime {
         return this.findPreviousWindowBorder(false, et, allowSameTime);
     }
 
@@ -285,7 +287,7 @@ export class ZoneCondition {
      * @param et 
      * @returns 
      */
-    findNextWindowStart(et: EorzeaTime): EorzeaTime {
+    findNextWindowStart(et?: EorzeaTime): EorzeaTime {
         return this.findNextWindowBorder(true, et);
     }
 
@@ -294,7 +296,7 @@ export class ZoneCondition {
      * @param et 
      * @returns 
      */
-    findNextWindowEnd(et: EorzeaTime): EorzeaTime {
+    findNextWindowEnd(et?: EorzeaTime): EorzeaTime {
         return this.findNextWindowBorder(false, et);
     }
 
@@ -330,7 +332,7 @@ export class ZoneCondition {
         let et = base ?? EorzeaTime.now()
         if (this.isAlways()) return et;
         if (!this.isValidWeatherConditionForZone()) throw new Error(`Cannot find the next match (weather set is invalid)`);
-        et = this.findWindowEnd(et); // 今マッチしている場合は終了する時間へ飛ぶ
+        et = this.findNextWindowEnd(et); // 今マッチしている場合は終了する時間へ飛ぶ
         const candidates = this.windowStartCandidates;
         do {
             et = this.getNextEorzeaTimeFromCandidateMinutes(et, candidates);
