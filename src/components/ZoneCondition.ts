@@ -38,6 +38,11 @@ export interface MinimizedZoneConditionOptions {
     p?: ZoneConditionOptions["previousWeather"]
 }
 
+export interface ZoneConditionMatchedWindow {
+    start: EorzeaTime;
+    end: EorzeaTime;
+}
+
 /** 最小化された条件から{@link ZoneConditionOptions}のオブジェクトを作成する */
 export function extractMinimizedZoneConditionOptions(o: MinimizedZoneConditionOptions): ZoneConditionOptions {
     return { zone: o.z, et: o.t ? { start: o.t.s, end: o.t.e } : undefined, weather: o.w, previousWeather: o.p }
@@ -70,7 +75,7 @@ export class ZoneCondition {
         previous: Set<Weather>
     }
 
-    protected cachedTimeToCheckCandidate?: number[]
+    protected cachedWindowStartCandidates?: number[]
 
     constructor(options: ZoneConditionOptions) {
         this.zone = options.zone
@@ -165,16 +170,27 @@ export class ZoneCondition {
         return this.isMatchTime(et) && this.isMatchWeather(et)
     }
 
-    /** 保持している時間条件からチェックする必要のあるETのリストを作成して返す。 */
-    protected getTimeToCheckCandidates(): number[] {
-        if (this.cachedTimeToCheckCandidate) return this.cachedTimeToCheckCandidate;
+    protected get weatherChangeTimeInWindow(): number[] {
+        if (!this.hasWeatherCondition()) return [];
+        const candidates = [0, 480, 960];
         const et = this.et;
-        if (!this.hasWeatherCondition()) return et ? [et.start] : [0]; // 時間条件のみの場合は開始時間のみ、常に条件を満たす場合は0(0:00)のみを返す
-        const allWeatherChange = [0, 480, 960]
-        if (!et) return allWeatherChange; // 0:00, 8:00, 16:00
-        const candidates = [et.start]
-        allWeatherChange.filter(m => et.start < et.end ? et.start < m && m < et.end : et.start < m || m < et.end).map(m => candidates.push(m))
-        return this.cachedTimeToCheckCandidate = candidates.toSorted((a, b) => a - b)
+        if (!et) return candidates;
+        return candidates.filter(m => et.start < et.end ? et.start < m && m < et.end : et.start < m || m < et.end).toSorted((a, b) => a - b);
+    }
+
+    /** 保持している時間条件からウィンドウの開始としてチェックする必要のあるETのリストを作成して返す。 */
+    protected get windowStartCandidates(): number[] {
+        return Array.from(new Set([this.et ? this.et.start : 0, ...this.weatherChangeTimeInWindow]));
+    }
+
+    /** 保持している時間条件からウィンドウの終了としてチェックする必要のあるETのリストを作成して返す。 */
+    protected get windowEndCandidates(): number[] {
+        return Array.from(new Set([this.et ? this.et.end : 0, ...this.weatherChangeTimeInWindow]));
+    }
+
+    /** ウィンドウの境界となる可能性のある時間のリスト */
+    protected get windowCandidates(): number[] {
+        return Array.from(new Set([...(this.et ? [this.et.start, this.et.end] : [0]), ...this.weatherChangeTimeInWindow]));
     }
 
     protected getNextEorzeaTimeFromCandidateMinutes(et: EorzeaTime, minutes: number[]) {
@@ -184,11 +200,121 @@ export class ZoneCondition {
         return et.getSpecifiedTime(Math.floor(next / 60), next % 60)
     }
 
-    /** 指定されたエオルゼア時間から次のチェック対象となる時間を探して返す。 */
-    protected getNextEorzeaTimeToCheck(et: EorzeaTime) {
-        if (!this.et) return et.getWeatherTime(1);
-        const candidates = this.getTimeToCheckCandidates()
-        return this.getNextEorzeaTimeFromCandidateMinutes(et, candidates)
+    /**
+     * チェックすべきエオルゼア時間を返す
+     * @param et 現在の調査対象エオルゼア時間
+     * @param candidates チェック候補となる、1日のうち0:00から何分経過したかを示す0～1440の整数の配列
+     * @param isNext エオルゼア時間を進めるか(true: 進める, false: 戻す)
+     * @returns 次の調査対象エオルゼア時間
+     */
+    private getCandidate(et: EorzeaTime, candidates: number[], isNext: boolean) {
+        const time = et.hours * 60 + et.minutes;
+        const sortedCandidates = Array.from(new Set(candidates)).toSorted((a, b) => isNext ? a - b : b - a);
+        const matched = sortedCandidates.find(c => isNext ? time < c : c < time) ?? sortedCandidates[0];
+        // 同じETである場合のループを回避: 1/2 0:00→(skipDays)1/1 0:00→(getSpecifiedTime)1/2 0:00 で同じ時間になってしまう
+        const daysToSkip = isNext ? 0 : (time == matched ? -2 : -1);
+        return et.skipDays(daysToSkip).getSpecifiedTime(Math.floor(matched / 60), matched % 60);
+    }
+
+    private getPreviousCandidate(et: EorzeaTime, candidates: number[]) {
+        return this.getCandidate(et, candidates, false);
+    }
+
+    private getNextCandidate(et: EorzeaTime, candidates: number[]) {
+        return this.getCandidate(et, candidates, true);
+    }
+
+    /** `curr`がウィンドウの始端かを判定する */
+    private isWindowStart(prev: EorzeaTime, curr: EorzeaTime) {
+        return !this.isMatch(prev) && this.isMatch(curr)
+    }
+
+    /** `curr`がウィンドウの終端かを判定する */
+    private isWindowEnd(prev: EorzeaTime, curr: EorzeaTime) {
+        return this.isMatch(prev) && !this.isMatch(curr);
+    }
+
+    private findPreviousWindowBorder(isFindStart: boolean, et: EorzeaTime, allowSameTime: boolean = true) {
+        if (this.isAlways()) return et;
+        const candidates = this.windowCandidates;
+        let current = new EorzeaTime(et.unixSeconds - (allowSameTime ? 0 : 1));
+        const getPrevious = () => this.getPreviousCandidate(current, candidates);
+        const isSatisfied = (p: EorzeaTime, c: EorzeaTime) => isFindStart ? this.isWindowStart(p, c) : this.isWindowEnd(p, c);
+        let previous = getPrevious();
+        while (!isSatisfied(previous, current)) {
+            current = previous;
+            previous = getPrevious();
+        }
+        return current
+    }
+
+    private findNextWindowBorder(isFindStart: boolean, et: EorzeaTime): EorzeaTime {
+        if (this.isAlways()) return et;
+        const candidates = this.windowCandidates;
+        let current = et;
+        const getNext = () => this.getNextCandidate(current, candidates);
+        const isSatisfied = (c: EorzeaTime, n: EorzeaTime) => isFindStart ? this.isWindowStart(c, n) : this.isWindowEnd(c, n);
+        let next = getNext();
+        while (!isSatisfied(current, next)) {
+            current = next;
+            next = getNext();
+        }
+        return next
+    }
+
+    /**
+     * `et` と同じかより前の時間でウィンドウが開始した時間を返す
+     * @param et 
+     * @param allowSameTime etに与えた時間と同じ時間を許容するか
+     */
+    findPreviousWindowStart(et: EorzeaTime, allowSameTime?: boolean): EorzeaTime {
+        return this.findPreviousWindowBorder(true, et, allowSameTime);
+    }
+
+    /**
+     * `et` と同じかより前の時間でウィンドウが終了した時間を返す
+     * @param et 
+     * @param allowSameTime etに与えた時間と同じ時間を許容するか
+     */
+    findPreviousWindowEnd(et: EorzeaTime, allowSameTime?: boolean): EorzeaTime {
+        return this.findPreviousWindowBorder(false, et, allowSameTime);
+    }
+
+    /**
+     * `et` より後の時間でウィンドウが開始する時間を返す
+     * @param et 
+     * @returns 
+     */
+    findNextWindowStart(et: EorzeaTime): EorzeaTime {
+        return this.findNextWindowBorder(true, et);
+    }
+
+    /**
+     * `et` より後の時間でウィンドウが終了する時間を返す
+     * @param et 
+     * @returns 
+     */
+    findNextWindowEnd(et: EorzeaTime): EorzeaTime {
+        return this.findNextWindowBorder(false, et);
+    }
+
+    findPreviousWindow(et: EorzeaTime, allowCurrent: boolean = false): ZoneConditionMatchedWindow {
+        const start = !allowCurrent && this.isMatch(et) ?
+            this.findPreviousWindowStart(this.findPreviousWindowStart(et, false), false) :
+            this.findPreviousWindowStart(et, true);
+        const end = this.findNextWindowEnd(start)
+        return { start, end }
+    }
+
+    findCurrentWindow(et: EorzeaTime): ZoneConditionMatchedWindow | null {
+        if (!this.isMatch(et)) return null;
+        return { start: this.findPreviousWindowStart(et, true), end: this.findNextWindowEnd(et) };
+    }
+
+    findNextWindow(et: EorzeaTime): ZoneConditionMatchedWindow {
+        const start = this.findNextWindowStart(et);
+        const end = this.findNextWindowEnd(start);
+        return { start, end }
     }
 
     /**
@@ -198,14 +324,16 @@ export class ZoneCondition {
      * 常にマッチする条件のインスタンスである場合は与えられたエオルゼア時間(指定しない場合は現在日時から作成されたエオルゼア時間)のインスタンスを返す。
      * @param base 
      * @returns 
+     * @deprecated Use {@link findNextWindowStart} or {@link findNextWindow} instead.
      */
     findNextMatch(base?: EorzeaTime): EorzeaTime {
         let et = base ?? EorzeaTime.now()
         if (this.isAlways()) return et;
         if (!this.isValidWeatherConditionForZone()) throw new Error(`Cannot find the next match (weather set is invalid)`);
         et = this.findWindowEnd(et); // 今マッチしている場合は終了する時間へ飛ぶ
+        const candidates = this.windowStartCandidates;
         do {
-            et = this.getNextEorzeaTimeToCheck(et);
+            et = this.getNextEorzeaTimeFromCandidateMinutes(et, candidates);
         } while (!this.isMatch(et)); // isWeatherMatchだけでも十分に判定できるが念のため
         return et;
     }
@@ -213,12 +341,12 @@ export class ZoneCondition {
     /**
      * 与えられた `base` (指定しない場合は現在時間) から条件(気候、ET)が終了する時間を算出する。
      * 与えられたエオルゼア時間が条件を満たす時間ではない場合、そのまま返す。
+     * @deprecated Use {@link findNextWindowEnd} or {@link findPreviousWindowEnd} instead.
      */
     findWindowEnd(base?: EorzeaTime): EorzeaTime {
         let et = base ?? EorzeaTime.now();
-        if (this.isAlways()) return et;
-        const weatherChange = [0, 480, 960];
-        const candidates = [...weatherChange, ...(this.et ? [this.et.end] : [])]
+        if (this.isAlways() || !this.isMatch(et)) return et;
+        const candidates = this.windowEndCandidates;
         while (this.isMatch(et)) {
             et = this.getNextEorzeaTimeFromCandidateMinutes(et, candidates)
         }
