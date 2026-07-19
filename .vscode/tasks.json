@@ -21,9 +21,6 @@
 				"clean build files",
 				"npm: build"
 			],
-			"runOptions": {
-				"runOn": "folderOpen"
-			}
 		},
 		{
 			"type": "npm",
@@ -32,9 +29,6 @@
 			"problemMatcher": [],
 			"label": "npm: build:watch",
 			"detail": "tsc --watch",
-			"runOptions": {
-				"runOn": "folderOpen"
-			}
 		},
 	]
 }
