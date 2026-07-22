@@ -300,6 +300,13 @@ export class ZoneCondition {
         return this.findNextWindowBorder(false, et);
     }
 
+    /**
+     * 指定された `et` より前に終了したウィンドウの開始および終了時刻を見つける。
+     * `allowCurrent` が `true` の場合は、`et` がウィンドウ内の場合に当該ウィンドウを返す。
+     * @param et 
+     * @param allowCurrent `et` がウィンドウ内の場合に当該ウィンドウを返り値として許可するか。許可しない場合は `et` よりも前に終了したウィンドウに限定する。
+     * @returns 
+     */
     findPreviousWindow(et: EorzeaTime, allowCurrent: boolean = false): ZoneConditionMatchedWindow {
         const start = !allowCurrent && this.isMatch(et) ?
             this.findPreviousWindowStart(this.findPreviousWindowStart(et, false), false) :
@@ -308,11 +315,22 @@ export class ZoneCondition {
         return { start, end }
     }
 
+    /**
+     * 指定された時間のウィンドウを見つける。
+     * 指定された時間がウィンドウ内でない場合は `null` を返す。
+     * @param et 
+     * @returns 
+     */
     findCurrentWindow(et: EorzeaTime): ZoneConditionMatchedWindow | null {
         if (!this.isMatch(et)) return null;
         return { start: this.findPreviousWindowStart(et, true), end: this.findNextWindowEnd(et) };
     }
 
+    /**
+     * 指定された `et` より後に開始するウィンドウの開始および終了時刻を見つける。
+     * @param et 
+     * @returns 
+     */
     findNextWindow(et: EorzeaTime): ZoneConditionMatchedWindow {
         const start = this.findNextWindowStart(et);
         const end = this.findNextWindowEnd(start);
