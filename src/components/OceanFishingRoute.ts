@@ -148,14 +148,14 @@ export class OceanFishingRoute {
     }
 
     /** 近海航路または遠洋航路のルートを返す */
-    protected getRoute(isIndigo: boolean) {
+    protected getRoute(isIndigo: boolean): RouteZone[] {
         const dest = isIndigo ? this.getIndigoDestination() : this.getRubyDestination();
         const route = this.getAllZonesForDestination(dest);
         if (!route) throw new Error(`Route for ${dest} is not registered.`);
         const times = this.getTimes();
         if (times.length != route.length) throw new Error(`Number of time zones and routes does not match`);
         return times.map((t, i) => {
-            return {time: t, zone: route[i]} as RouteZone
+            return {time: t, zone: route[i]}
         });
     }
 
