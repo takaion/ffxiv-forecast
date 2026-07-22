@@ -1,14 +1,14 @@
 {
   "name": "@takaion/ffxiv-forecast",
   "description": "",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "author": "takaion",
   "license": "Apache-2.0",
   "type": "module",
   "engines": {
     "node": ">=24"
   },
-  "packageManager": "pnpm@11.7.0",
+  "packageManager": "pnpm@11.15.0",
   "exports": {
     ".": {
       "import": {
@@ -44,7 +44,7 @@
     "jiti": "^2.7.0",
     "tsx": "^4.23.1",
     "typescript": "^6.0.3",
-    "typescript-eslint": "^8.64.0",
+    "typescript-eslint": "^8.65.0",
     "vitest": "^4.1.10"
   }
 }
